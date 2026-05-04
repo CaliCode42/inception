@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  mariadb:
+    build: ./srcs/requirements/mariadb
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_pass
+    volumes:
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    build: ./srcs/requirements/wordpress
+    container_name: wordpress
+    restart: always
+    depends_on:
+      - mariadb
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_pass
+      MYSQL_HOST: mariadb
+    ports:
+      - "9000:9000"
+    volumes:
+      - wp_data:/var/www/wordpress
+
+  nginx:
+    build: ./srcs/requirements/nginx
+    container_name: nginx
+    restart: always
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+    volumes:
+      - wp_data:/var/www/wordpress
+
+volumes:
+  db_data:
+  wp_data:
