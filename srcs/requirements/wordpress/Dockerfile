@@ -5,7 +5,12 @@ RUN apt update && apt install -y \
     php-fpm \
     php-mysql \
     curl \
-    ca-certificates
+    ca-certificates \
+    mariadb-client
+
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    && chmod +x wp-cli.phar \
+    && mv wp-cli.phar /usr/local/bin/wp
 
 RUN mkdir -p /var/www \
     && curl -O https://wordpress.org/latest.tar.gz \

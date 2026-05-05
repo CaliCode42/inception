@@ -4,14 +4,26 @@
 mysqld_safe &
 
 # wait for MariaDB to be ready
-until mysqladmin ping -h "localhost" --silent; do
+until mysqladmin ping --silent; do
     sleep 1
 done
 
-# create database and users (once only)
+# create database and users (reset first if exist)
 mysql -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};"
-mysql -e "CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
+
+mysql -e "DROP USER IF EXISTS '${MYSQL_USER}'@'%';"
+mysql -e "DROP USER IF EXISTS '${MYSQL_USER}'@'localhost';"
+mysql -e "DROP USER IF EXISTS '${MYSQL_USER}'@'wordpress';"
+mysql -e "DROP USER IF EXISTS '${MYSQL_USER}'@'wordpress.git_inception_default';"
+
+mysql -e "CREATE USER '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
+mysql -e "CREATE USER '${MYSQL_USER}'@'wordpress' IDENTIFIED BY '${MYSQL_PASSWORD}';"
+mysql -e "CREATE USER '${MYSQL_USER}'@'wordpress.git_inception_default' IDENTIFIED BY '${MYSQL_PASSWORD}';"
+
 mysql -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';"
+mysql -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'wordpress';"
+mysql -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'wordpress.git_inception_default';"
+
 mysql -e "FLUSH PRIVILEGES;"
 
 # keep process active

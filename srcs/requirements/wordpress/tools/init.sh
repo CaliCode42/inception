@@ -2,13 +2,30 @@
 
 cd /var/www/wordpress
 
-# config WordPress
-cp wp-config-sample.php wp-config.php
+# attendre MariaDB
+until mysqladmin ping -h"$MYSQL_HOST" --silent; do
+    sleep 2
+done
 
-sed -i "s/database_name_here/${MYSQL_DATABASE}/" wp-config.php
-sed -i "s/username_here/${MYSQL_USER}/" wp-config.php
-sed -i "s/password_here/${MYSQL_PASSWORD}/" wp-config.php
-sed -i "s/localhost/${MYSQL_HOST}/" wp-config.php
+# supprimer config existante (IMPORTANT)
+rm -f wp-config.php
 
-# lancer php-fpm
-php-fpm7.4 -F
+# recréer config propre
+wp config create \
+    --dbname=$MYSQL_DATABASE \
+    --dbuser=$MYSQL_USER \
+    --dbpass=$MYSQL_PASSWORD \
+    --dbhost=$MYSQL_HOST \
+    --allow-root
+
+# installer WordPress
+wp core install \
+    --url=$DOMAIN_NAME \
+    --title="Inception" \
+    --admin_user=$MYSQL_ADMIN \
+    --admin_password=$MYSQL_ADMIN_PASSWORD \
+    --admin_email=admin@42.fr \
+    --skip-email \
+    --allow-root
+
+/usr/sbin/php-fpm7.4 -F
