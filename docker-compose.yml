@@ -7,7 +7,7 @@ services:
     env_file: .env
     volumes:
       - mariadb:/var/lib/mysql
-    restart: unless-stopped
+    restart: always
     expose:
       - "3306"
 
@@ -19,7 +19,7 @@ services:
     build: ./srcs/requirements/wordpress
     depends_on:
       - mariadb
-    restart: on-failure
+    restart: always
     expose:
       - "9000"
 
@@ -31,7 +31,7 @@ services:
       - wordpress
     build: ./srcs/requirements/nginx
     env_file: .env
-    restart: on-failure
+    restart: always
     ports:
       - "443:443"
 
