@@ -1,22 +1,22 @@
 FROM debian:bullseye
 
 RUN apt update && apt install -y \
-    php \
-    php-fpm \
-    php-mysql \
+	php \
+	php-fpm\
+	php-mysql\
     curl \
     ca-certificates \
-    mariadb-client
+	mariadb-client
 
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
     && chmod +x wp-cli.phar \
-    && mv wp-cli.phar /usr/local/bin/wp
-
+	&& mv wp-cli.phar /usr/local/bin/wp
+	
 RUN mkdir -p /var/www \
-    && curl -O https://wordpress.org/latest.tar.gz \
-    && tar -xzf latest.tar.gz \
+	&& curl -O https://fr.wordpress.org/wordpress-6.9-fr_FR.tar.gz \
+	&& tar -xzf wordpress-6.9-fr_FR.tar.gz \
     && mv wordpress /var/www/wordpress \
-    && rm latest.tar.gz
+    && rm wordpress-6.9-fr_FR.tar.gz
 
 # config PHP-FPM
 RUN sed -i 's|listen = .*|listen = 9000|' /etc/php/*/fpm/pool.d/www.conf

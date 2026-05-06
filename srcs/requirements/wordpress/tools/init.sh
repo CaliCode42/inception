@@ -4,19 +4,20 @@ cd /var/www/wordpress
 
 # attendre MariaDB
 until mysqladmin ping -h"$MYSQL_HOST" --silent; do
-    sleep 2
+    sleep 10
 done
 
-# supprimer config existante (IMPORTANT)
-rm -f wp-config.php
+# check if config exists (IMPORTANT)
+if [ ! -e wp-config.php ]; then
 
-# recréer config propre
-wp config create \
-    --dbname=$MYSQL_DATABASE \
-    --dbuser=$MYSQL_USER \
-    --dbpass=$MYSQL_PASSWORD \
-    --dbhost=$MYSQL_HOST \
-    --allow-root
+# créer config propre
+	wp config create \
+		--dbname=$MYSQL_DATABASE \
+		--dbuser=$MYSQL_USER \
+		--dbpass=$MYSQL_PASSWORD \
+		--dbhost=mariadb:3306 --path='/var/www/wordpress' \
+		--allow-root
+fi
 
 # installer WordPress
 wp core install \
@@ -28,4 +29,4 @@ wp core install \
     --skip-email \
     --allow-root
 
-/usr/sbin/php-fpm7.4 -F
+php-fpm7.4 -F

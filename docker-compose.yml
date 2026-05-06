@@ -2,45 +2,39 @@ version: "3"
 
 services:
   mariadb:
-    build: ./srcs/requirements/mariadb
     container_name: mariadb
-    restart: always
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    build: ./srcs/requirements/mariadb
+    env_file: .env
     volumes:
-      - db_data:/var/lib/mysql
+      - mariadb:/var/lib/mysql
+    restart: unless-stopped
+    expose:
+      - "3306"
 
   wordpress:
-    build: ./srcs/requirements/wordpress
     container_name: wordpress
-    restart: always
+    env_file: .env
+    volumes:
+      - wordpress:/var/www/wordpress
+    build: ./srcs/requirements/wordpress
     depends_on:
       - mariadb
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_HOST: ${MYSQL_HOST}
-      MYSQL_ADMIN: ${MYSQL_ADMIN}
-      MYSQL_ADMIN_PASSWORD: ${MYSQL_ADMIN_PASSWORD}
-    ports:
-      - "9000:9000"
-    volumes:
-      - wp_data:/var/www/wordpress
+    restart: on-failure
+    expose:
+      - "9000"
 
   nginx:
-    build: ./srcs/requirements/nginx
     container_name: nginx
-    restart: always
+    volumes:
+      - wordpress:/var/www/wordpress
     depends_on:
       - wordpress
+    build: ./srcs/requirements/nginx
+    env_file: .env
+    restart: on-failure
     ports:
       - "443:443"
-    volumes:
-      - wp_data:/var/www/wordpress
 
 volumes:
-  db_data:
-  wp_data:
+  wordpress:
+  mariadb:
