@@ -29,4 +29,4 @@ wp core install \
     --skip-email \
     --allow-root
 
-php-fpm7.4 -F
+php-fpm8.2 -F
