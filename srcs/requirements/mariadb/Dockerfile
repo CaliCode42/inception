@@ -1,12 +1,7 @@
-FROM debian:bookworm
-
-RUN apt update && apt install -y mariadb-server
+FROM mariadb:10.11
 
 COPY conf/my.cnf /etc/mysql/my.cnf
-COPY tools/init.sh /init.sh
 
-RUN chmod +x /init.sh
+COPY conf/init.sql /docker-entrypoint-initdb.d/
 
-EXPOSE 3306
-
-CMD ["/init.sh"]
+RUN chmod 644 /etc/mysql/my.cnf
