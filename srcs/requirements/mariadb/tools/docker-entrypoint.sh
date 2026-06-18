@@ -9,7 +9,7 @@ if [ ! -d /var/lib/mysql/mysql ]; then
     mysql_install_db --user=mysql --datadir=/var/lib/mysql >/dev/null 2>&1
 fi
 
-# Démarrer MariaDB en arrière-plan sans authentification pour l'initialisation
+# Launch MariaDB in background without authentification for initialization
 mysqld_safe --skip-grant-tables &
 MYSQLD_PID=$!
 
@@ -23,7 +23,7 @@ for i in {1..30}; do
     sleep 1
 done
 
-# Exécuter les commandes d'initialisation
+# Execute initialisation's commands
 mysql -u root <<EOF
 FLUSH PRIVILEGES;
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MARIADB_ROOT_PASSWORD}';
@@ -33,11 +33,11 @@ GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO \`${MYSQL_USER}\`@'%';
 FLUSH PRIVILEGES;
 EOF
 
-# Arrêter et relancer avec authentification
+# Stop and relaunch with authentification
 echo "Restarting MariaDB with authentication..."
 mysqladmin -u root -p"${MARIADB_ROOT_PASSWORD}" shutdown >/dev/null 2>&1 || true
 wait $MYSQLD_PID 2>/dev/null || true
 sleep 2
 
-# Démarrer MariaDB normalement
+# Start MariaDB normaly
 exec mysqld_safe
