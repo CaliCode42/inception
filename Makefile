@@ -1,11 +1,16 @@
 NAME = inception
 
 COMPOSE = docker compose
+DATA_DIR = /home/tcali/data
 
 all: up
 
-up:
-	$(COMPOSE) up --build
+prepare:
+	mkdir -p $(DATA_DIR)/mariadb
+	mkdir -p $(DATA_DIR)/wordpress
+
+up: prepare
+	$(COMPOSE) up --build -d
 
 down:
 	$(COMPOSE) down
@@ -15,6 +20,7 @@ clean:
 
 fclean:
 	$(COMPOSE) down -v --rmi all
+	sudo rm -rf $(DATA_DIR)
 
 re: fclean up
 
